@@ -1,3 +1,4 @@
+
 const navLinks = document.querySelectorAll('header nav a');
 const logoLink = document.querySelector('.logo');
 const sections = document.querySelectorAll('section');
@@ -18,33 +19,25 @@ const activePage = () => {
         header.classList.add('active');
     }, 1100);
 
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-    });
+    navLinks.forEach(link => link.classList.remove('active'));
 
     barsBox.classList.remove('active');
     setTimeout(() => {
         barsBox.classList.add('active');
     }, 1100);
 
-    sections.forEach(section => {
-        section.classList.remove('active');
-    });
+    sections.forEach(section => section.classList.remove('active'));
 
     menuIcon.classList.remove('bx-x');
     navbar.classList.remove('active');
-}
+};
 
 navLinks.forEach((link, idx) => {
     link.addEventListener('click', () => {
         if (!link.classList.contains('active')) {
             activePage();
-
             link.classList.add('active');
-
-            setTimeout(() => {
-                sections[idx].classList.add('active');
-            }, 1100);
+            setTimeout(() => sections[idx].classList.add('active'), 1100);
         }
     });
 });
@@ -52,73 +45,59 @@ navLinks.forEach((link, idx) => {
 logoLink.addEventListener('click', () => {
     if (!navLinks[0].classList.contains('active')) {
         activePage();
-
         navLinks[0].classList.add('active');
-
-        setTimeout(() => {
-            sections[0].classList.add('active');
-        }, 1100);
+        setTimeout(() => sections[0].classList.add('active'), 1100);
     }
 });
 
 const resumeBtns = document.querySelectorAll('.resume-btn');
-
 resumeBtns.forEach((btn, idx) => {
     btn.addEventListener('click', () => {
         const resumeDetails = document.querySelectorAll('.resume-detail');
-
-        resumeBtns.forEach(btn => {
-            btn.classList.remove('active');
-        });
+        resumeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
-        resumeDetails.forEach(detail => {
-            detail.classList.remove('active');
-        });
+        resumeDetails.forEach(detail => detail.classList.remove('active'));
         resumeDetails[idx].classList.add('active');
     });
 });
 
-const arrowRight = document.querySelector('.portfolio-box .navigation .arrow-right');
-const arrowLeft = document.querySelector('.portfolio-box .navigation .arrow-left');
+/* -------- Multiple carousels (per portfolio-container) -------- */
+function initCarousel(container) {
+    const arrowRight = container.querySelector('.navigation .arrow-right');
+    const arrowLeft = container.querySelector('.navigation .arrow-left');
+    const imgSlide = container.querySelector('.portfolio-carousel .img-slide');
+    const portfolioDetails = container.querySelectorAll('.portfolio-detail');
+    let index = 0;
 
-let index = 0;
+    const activePortfolio = () => {
+        const total = portfolioDetails.length;
+        if (imgSlide) {
+            imgSlide.style.transform = `translateX(calc(${index * -100}% - ${index * 2}rem))`;
+        }
+        portfolioDetails.forEach(d => d.classList.remove('active'));
+        portfolioDetails[index].classList.add('active');
+        if (arrowLeft) arrowLeft.classList.toggle('disabled', index <= 0);
+        if (arrowRight) arrowRight.classList.toggle('disabled', index >= total - 1);
+    };
 
-const activePortfolio = () => {
-    const imgSlide = document.querySelector('.portfolio-carousel .img-slide');
-    const portfolioDetails = document.querySelectorAll('.portfolio-detail');
-    const totalProjects = portfolioDetails.length;
-
-    imgSlide.style.transform = `translateX(calc(${index * -100}% - ${index * 2}rem))`;
-
-    portfolioDetails.forEach(detail => {
-        detail.classList.remove('active');
-    });
-    portfolioDetails[index].classList.add('active');
+    if (arrowRight) {
+        arrowRight.addEventListener('click', () => {
+            if (index < portfolioDetails.length - 1) {
+                index++;
+                activePortfolio();
+            }
+        });
+    }
+    if (arrowLeft) {
+        arrowLeft.addEventListener('click', () => {
+            if (index > 0) {
+                index--;
+                activePortfolio();
+            }
+        });
+    }
+    // initialize
+    activePortfolio();
 }
 
-arrowRight.addEventListener('click', () => {
-    if (index < 1) {
-        index++;
-        arrowLeft.classList.remove('disabled');
-    }
-    else {
-        (index > 1);
-        arrowRight.classList.add('disabled');
-    }
-
-    activePortfolio();
-});
-
-arrowLeft.addEventListener('click', () => {
-    if (index > 0) {
-        index--;
-        arrowRight.classList.remove('disabled');
-    }
-    else {
-        (index <= 0);
-        arrowLeft.classList.add('disabled');
-    }
-
-    activePortfolio();
-});
+document.querySelectorAll('.portfolio-container').forEach(initCarousel);
